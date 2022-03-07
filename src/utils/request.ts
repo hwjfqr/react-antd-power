@@ -24,6 +24,7 @@ const codeMessage: { [prop: number]: string } = {
   503: '服务不可用，服务器暂时过载或维护。',
   504: '网关超时。',
 };
+
 /**
  * 异常处理（http 状态码不在大于等于 200 以及小于 300 的区间时，会触发 HttpError）
  * Restful API 情况下错误处理
@@ -31,18 +32,16 @@ const codeMessage: { [prop: number]: string } = {
 const errorHandler: ((error: ResponseError<any>) => void) | undefined = (
   error,
 ) => {
-  const { response, data = {} } = error;
-  const { status_code: code = 0, message: msg = '' } = data;
+  const { response, data } = error;
+  const { status_code: code = 0, message: msg = '' } = data || {};
 
   if (code) {
     message.error(`${msg || '服务器发生错误'}（错误码：${code}）`);
   } else {
-    const errortext: string =
-      codeMessage[response?.status as number] ||
-      (response?.statusText as string);
-    const { status, url } = response || {};
+    const { status, url = '', statusText = '' } = response || {};
+    const errortext: string = codeMessage[status] || statusText;
     notification.error({
-      message: `请求错误 ${status}: ${url}`,
+      message: `请求错误 ${status || ''} ${url}`,
       description: errortext,
     });
   }
@@ -77,10 +76,12 @@ request.interceptors.request.use(
 // 响应拦截器(非 Restful API 错误处理)
 request.interceptors.response.use(
   async (response) => {
-    // const data = await response.clone().json();
-    // const { code, msg } = data;
-    // if (code !== '0' && code !== 0) {
-    //   message.error(msg || '服务端发生错误');
+    // if (response.ok) {
+    //   const data = await response.clone().json();
+    //   const { code, msg } = data;
+    //   if (code !== '0' && code !== 0) {
+    //     message.error(msg || '服务端发生错误');
+    //   }
     // }
     return response;
   },

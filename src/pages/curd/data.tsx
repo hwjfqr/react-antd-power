@@ -47,7 +47,7 @@ export const getListItemDetails = (data: { [prop: string]: any }) => {
     const value = data[k];
     return {
       label,
-      value: format ? format(value) : value,
+      value: format ? format(value, data) : value,
     };
   });
 

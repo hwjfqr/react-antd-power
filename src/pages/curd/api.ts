@@ -42,7 +42,7 @@ export async function addOrEditListItem({
   type,
   status,
 }: AddOrEditDataType) {
-  let url = '/mock/app';
+  let url = '/mock/add';
   let method = 'post';
   if (!!id) {
     url = '/mock/update';
