@@ -80,3 +80,59 @@ export const describeItemAdaptationAlg = (
   });
   return tList;
 };
+
+/**
+ * 使用 setTimeout 实现类 setInterval 的效果，应用于轮询请求等场景。
+ * @param cb
+ * @param dely
+ * @returns
+ */
+export const setTimeout = (cb: () => void, dely = 1000) => {
+  let timer: number;
+  const inner = (fn: () => void) => {
+    if (fn) fn();
+    if (timer) clearTimeout(timer);
+    timer = window.setTimeout(inner, dely, cb);
+    return timer;
+  };
+  timer = inner(cb);
+  const clear = () => {
+    clearTimeout(timer);
+  };
+  return clear;
+};
+
+/**
+ * 防抖
+ * @param cb
+ * @param dely
+ * @returns
+ */
+export function debounce(cb: (...args: any[]) => void, dely: number) {
+  let timer: number;
+  return function (this: any, ...args: any[]) {
+    let _this = this;
+    if (timer) clearTimeout(timer);
+    timer = window.setTimeout(function () {
+      cb.call(_this, ...args);
+    }, dely);
+  };
+}
+
+/**
+ * 节流
+ * @param cb
+ * @param dely
+ * @returns
+ */
+export function throttle(cb: (...args: any[]) => void, dely: number) {
+  let timer: number | undefined;
+  return function (this: any, ...args: any[]) {
+    if (timer) return;
+    let _this = this;
+    timer = window.setTimeout(function () {
+      cb.call(_this, ...args);
+      timer = undefined;
+    }, dely);
+  };
+}
