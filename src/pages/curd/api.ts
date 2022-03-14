@@ -4,16 +4,9 @@ export type ListFilterType = {
   page: number;
   pageSize?: number;
   name?: string;
+  type?: string;
 };
-export async function getList({
-  page,
-  pageSize,
-  name,
-}: {
-  page: number;
-  pageSize?: number;
-  name?: string;
-}) {
+export async function getList({ page, pageSize, name, type }: ListFilterType) {
   const { data = [], meta = { pagination: { total: 0 } } } = await request(
     '/mock/list',
     {
@@ -21,6 +14,7 @@ export async function getList({
         page,
         pageSize,
         name,
+        type: type === 'all' ? undefined : type,
       },
     },
   );

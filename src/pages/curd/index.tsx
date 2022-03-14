@@ -12,7 +12,7 @@ import {
 } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import { TagSelector, ModalDetail, ModalForm } from 'ant-design-power';
-// import StandardFormRow from '@/components/StandardFormRow';
+import StandardFormRow from '@/components/StandardFormRow';
 import Context from '@/context';
 import { getListItemDetails, listCols as cols } from './data';
 import {
@@ -28,7 +28,6 @@ function CurdTemplate() {
   const { deviceType } = useContext(Context);
 
   /* 列表逻辑 */
-  const [form] = Form.useForm();
   const [list, setList] = useState({
     data: [],
     total: 0,
@@ -37,6 +36,7 @@ function CurdTemplate() {
     page: 1,
     pageSize: 10,
     name: undefined,
+    type: 'all',
   });
   const getListFn = async () => {
     const { data, total } = await getList(listFilter);
@@ -45,15 +45,6 @@ function CurdTemplate() {
   useEffect(() => {
     getListFn();
   }, [listFilter]);
-  const handleFilterSubmit = async (
-    values: Omit<ListFilterType, 'page' | 'pageSize'>,
-  ) => {
-    setListFilter({
-      ...listFilter,
-      ...values,
-      page: 1,
-    });
-  };
 
   /* 详情逻辑 */
   const [listItemDetailArgs, setListItemDetailArgs] = useState<{
@@ -107,6 +98,7 @@ function CurdTemplate() {
                 Modal.confirm({
                   title: '删除',
                   content: `确认删除吗？`,
+                  maskClosable: true,
                   onOk: async () => {
                     const b = await deleteListItem(r.id as number);
                     if (b) {
@@ -153,46 +145,46 @@ function CurdTemplate() {
           style={{ marginBottom: deviceType === 'web' ? 16 : 0 }}
           size={deviceType === 'web' ? 'default' : 'small'}
         >
-          <Form
-            layout="inline"
-            form={form}
-            onFinish={handleFilterSubmit}
-            onFinishFailed={(err) => console.log(`Failed:${err}`)}
-          >
-            <Form.Item label="用户名" name="name">
-              <Input style={{ width: 150 }} size="small"></Input>
-            </Form.Item>
-            <Form.Item label="用户类型" name="type">
-              <TagSelector
-                type="radio"
-                tags={['管理员', '普通用户', '访客'].map((item) => ({
-                  label: item,
-                  value: item,
-                }))}
-              ></TagSelector>
-            </Form.Item>
-            <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                style={{ marginRight: 6 }}
-                size="small"
-              >
-                查询
-              </Button>
-              <Button
-                size="small"
-                onClick={() => {
-                  form.resetFields();
-                  setListFilter({
-                    ...listFilter,
-                    name: undefined,
-                  });
-                }}
-              >
-                重置
-              </Button>
-            </Form.Item>
+          <Form layout="inline">
+            <StandardFormRow last>
+              <Form.Item label="用户名">
+                <Input.Search
+                  style={{ width: 150 }}
+                  size="small"
+                  enterButton
+                  allowClear
+                  defaultValue={listFilter.name}
+                  onSearch={(val) => {
+                    setListFilter((d) => ({
+                      ...d,
+                      name: val || undefined,
+                      page: 1,
+                    }));
+                  }}
+                ></Input.Search>
+              </Form.Item>
+              <Form.Item label="用户类型">
+                <TagSelector
+                  type="radio"
+                  tags={['管理员', '普通用户', '访客'].map((item) => ({
+                    label: item,
+                    value: item,
+                  }))}
+                  showAll
+                  value={listFilter.type}
+                  onChange={(val) => {
+                    setListFilter((d) => ({
+                      ...d,
+                      type: val,
+                      page: 1,
+                    }));
+                  }}
+                ></TagSelector>
+              </Form.Item>
+              {deviceType === 'mobile' ? (
+                <div>当前共有 {list.total} 条数据</div>
+              ) : null}
+            </StandardFormRow>
           </Form>
         </Card>
         <Card size={deviceType === 'web' ? 'default' : 'small'}>
@@ -244,10 +236,10 @@ function CurdTemplate() {
               visible: false,
             });
           }}
-          onSubmit={async (value, id) => {
+          onSubmit={async (value) => {
             const b = await addOrEditListItem(value);
             if (b) {
-              message.success(!id ? '添加成功！' : '修改成功！');
+              message.success(value.id ? '添加成功！' : '修改成功！');
               setListFilter({
                 ...listFilter,
                 page: 1,
