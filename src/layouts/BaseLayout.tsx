@@ -28,6 +28,8 @@ function BaseLayout({ location, children }: BaseLayoutProps) {
     }
   }, [pathname]);
 
+  const [collapsed, setCollapsed] = useState(false);
+
   return (
     <div
       className={`${styles['base-layout'] || ''} ${
@@ -59,6 +61,10 @@ function BaseLayout({ location, children }: BaseLayoutProps) {
             },
           ],
         }}
+        collapsed={collapsed}
+        onCollapse={(val) => {
+          setCollapsed(val);
+        }}
         onMenuHeaderClick={() => {
           history.push('/');
         }}
@@ -67,6 +73,9 @@ function BaseLayout({ location, children }: BaseLayoutProps) {
             onClick={() => {
               const { path } = item;
               if (!path) return;
+              if (deviceType === 'mobile') {
+                setCollapsed(true);
+              }
               setCurMenuItem(path);
               if (/^\//.test(path)) {
                 history.push(path);
