@@ -104,10 +104,10 @@ function CurdTemplate() {
                     if (b) {
                       message.success('删除成功！');
                       if (list.data.length === 1 && listFilter.page > 1) {
-                        setListFilter({
-                          ...listFilter,
+                        setListFilter((d) => ({
+                          ...d,
                           page: listFilter.page - 1,
-                        });
+                        }));
                       } else {
                         getListFn();
                       }
@@ -204,11 +204,11 @@ function CurdTemplate() {
               pageSize: listFilter.pageSize,
               showSizeChanger: true,
               onChange: (page, pageSize) => {
-                setListFilter({
-                  ...listFilter,
+                setListFilter((d) => ({
+                  ...d,
                   page,
                   pageSize,
-                });
+                }));
               },
             }}
           ></Table>
@@ -236,14 +236,14 @@ function CurdTemplate() {
               visible: false,
             });
           }}
-          onSubmit={async (value) => {
+          onSubmit={async (value, isEdit) => {
             const b = await addOrEditListItem(value);
             if (b) {
-              message.success(value.id ? '添加成功！' : '修改成功！');
-              setListFilter({
-                ...listFilter,
+              message.success(!isEdit ? '添加成功！' : '修改成功！');
+              setListFilter((d) => ({
+                ...d,
                 page: 1,
-              });
+              }));
             }
             return b;
           }}
