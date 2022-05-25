@@ -137,7 +137,7 @@ function CurdTemplate() {
               });
             }}
           >
-            新增
+            添加
           </Button>
         }
       >

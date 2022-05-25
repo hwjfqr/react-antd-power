@@ -53,12 +53,12 @@ function BaseLayout({ location, children }: BaseLayoutProps) {
               path: '/app/curd',
               icon: <UserOutlined />,
             },
-            {
-              name: '系统管理',
-              path: '/sys',
-              icon: <SettingOutlined />,
-              routes: [{ name: '角色管理', path: '/sys/role' }],
-            },
+            // {
+            //   name: '系统管理',
+            //   path: '/sys',
+            //   icon: <SettingOutlined />,
+            //   routes: [{ name: '角色管理', path: '/sys/role' }],
+            // },
           ],
         }}
         collapsed={collapsed}
