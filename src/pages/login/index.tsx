@@ -52,7 +52,7 @@ export default () => {
         <div className={styles['sms-code']}>
           <Input
             placeholder={mode === 'accountLogin' ? '密码' : '验证码'}
-            type="password"
+            type={mode === 'accountLogin' ? 'password' : 'text'}
             value={loginArgs.password}
             onChange={({ target: { value } }) =>
               setLoginArgs({
@@ -127,8 +127,15 @@ export default () => {
           <div style={{ paddingTop: 10, textAlign: 'right' }}>
             <a
               onClick={() => {
-                if (mode === 'accountLogin') setMode('msgLogin');
-                else setMode('accountLogin');
+                if (mode === 'accountLogin') {
+                  setMode('msgLogin');
+                } else {
+                  setMode('accountLogin');
+                }
+                setLoginArgs((d) => ({
+                  ...d,
+                  password: undefined,
+                }));
               }}
             >
               {mode === 'accountLogin' ? '短信验证码登录' : '账号密码登录'}

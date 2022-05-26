@@ -39,6 +39,7 @@ function BaseLayout({ location, children }: BaseLayoutProps) {
       <ProLayout
         style={{ minHeight: '100vh' }}
         title="CurdTemplate"
+        logo={null}
         navTheme="light"
         layout="mix"
         fixSiderbar

@@ -17,10 +17,10 @@ import Context from '@/context';
 import { getListItemDetails, listCols as cols } from './data';
 import {
   getList,
-  addOrEditListItem,
+  CreateOrUpdateLIstItem,
   deleteListItem,
   ListFilterType,
-  AddOrEditDataType,
+  CreateOrUpdateDataTYpe,
 } from './api';
 import styles from './index.less';
 
@@ -58,7 +58,7 @@ function CurdTemplate() {
   /* 添加与删除逻辑 */
   const [listItemFormArgs, setListItemFormArgs] = useState<{
     visible: boolean;
-    data?: AddOrEditDataType;
+    data?: CreateOrUpdateDataTYpe;
   }>({
     visible: false,
   });
@@ -227,7 +227,7 @@ function CurdTemplate() {
         </ModalDetail>
 
         {/* 添加与修改表单Modal */}
-        <ModalForm<AddOrEditDataType>
+        <ModalForm<CreateOrUpdateDataTYpe>
           title={!listItemFormArgs.data ? '添加' : '修改'}
           initialValue={listItemFormArgs.data}
           visible={listItemFormArgs.visible}
@@ -237,7 +237,7 @@ function CurdTemplate() {
             });
           }}
           onSubmit={async (value, isEdit) => {
-            const b = await addOrEditListItem(value);
+            const b = await CreateOrUpdateLIstItem(value);
             if (b) {
               message.success(!isEdit ? '添加成功！' : '修改成功！');
               setListFilter((d) => ({
@@ -251,7 +251,7 @@ function CurdTemplate() {
           <Form.Item
             label="用户名"
             name="username"
-            rules={[{ required: true, message: '请填写' }]}
+            rules={[{ required: true, message: '请输入' }]}
           >
             <Input />
           </Form.Item>
