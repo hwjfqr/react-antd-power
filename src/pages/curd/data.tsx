@@ -9,6 +9,7 @@ export const listCols: ColumnsType<{ [prop: string]: any }> &
     title: '用户名',
     dataIndex: 'username',
     width: 100,
+    type: 'title',
     render: (text) => text || '-',
   },
   {

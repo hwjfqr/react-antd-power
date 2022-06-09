@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 /**
  * 设置网页标题
@@ -36,4 +36,132 @@ const useIsMobile = (maxWidth = 768) => {
   return deviceType;
 };
 
-export { useSetDocTitle, useIsMobile };
+/**
+ * 获取 LocalStorage 的 Hook
+ * @param name LocalStorage Key 值
+ * @param options 包含初始值（initialValue）、序列化方法（serializer）、反序列化方法（deserializer）等配置。
+ * @returns
+ */
+function useLocalStorageValue<T>(
+  name: string,
+  options:
+    | {
+        initialValue?: T;
+        serializer?: (value: T) => string;
+        deserializer?: (value: string) => T;
+      }
+    | undefined = {
+    initialValue: undefined,
+    serializer: JSON.stringify,
+    deserializer: JSON.parse,
+  },
+): [T, (value: T | ((preValue: T) => T)) => void] {
+  const {
+    initialValue,
+    serializer = JSON.stringify,
+    deserializer = JSON.parse,
+  } = options;
+
+  const [value, setValue] = useState<T>(initialValue as T);
+
+  useEffect(() => {
+    const temp: string | null = localStorage.getItem(name);
+    let val;
+    if (typeof temp === 'string') {
+      val = deserializer(temp);
+    } else {
+      val = initialValue;
+    }
+    setValue(val);
+  }, [name]);
+
+  return [
+    value,
+    (val) => {
+      if (typeof val === 'function') {
+        setValue((pVal) => {
+          const newData = (val as (preValue: T) => T)(pVal);
+          localStorage.setItem(name, serializer(newData));
+          return newData;
+        });
+      } else {
+        localStorage.setItem(name, serializer(val));
+        setValue(val);
+      }
+    },
+  ];
+}
+
+/**
+ * 满足已读未读的应用场景（文章列表等）
+ * @param name
+ * @returns
+ */
+function useHaveReadData(name: string) {
+  return useLocalStorageValue<Map<string, number>>(name, {
+    initialValue: new Map([]),
+    deserializer: (val) => {
+      const data = JSON.parse(val);
+      return new Map(data);
+    },
+    serializer: (val) => {
+      return JSON.stringify([...val]);
+    },
+  });
+}
+
+/**
+ * 用于保存用户筛选配置（存储于LocalStorage）。
+ * @param name LocalStorage Key 值
+ * @param initListFilterValue 筛选状态的初始值
+ * @param initListFilterOnConf 根据本地存储的配置信息，自定义初始化筛选状态。
+ * @param handleListFilterChange 当筛选状态变化时，要执行的回调。
+ * @returns
+ */
+function useInitListFilterConf<T>(
+  name: string,
+  initListFilterValue: T,
+  initListFilterOnConf: (listFilterConf: T) => T,
+  handleListFilterChange: (listFilter: T) => void,
+) {
+  const [listFilter, setListFilter] = useState<T>(initListFilterValue);
+  const [listFilterConf, setListFilterConf] = useLocalStorageValue(name, {
+    initialValue: {},
+  });
+  const isFirstLoad = useRef(true);
+
+  useEffect(() => {
+    if (isFirstLoad.current && Object.keys(listFilterConf || {}).length) {
+      const initListfilter = initListFilterOnConf(listFilterConf as T);
+      setListFilter(initListfilter);
+      isFirstLoad.current = false;
+    }
+  }, [listFilterConf]);
+
+  useEffect(() => {
+    if (!isFirstLoad.current) {
+      handleListFilterChange(listFilter);
+      setListFilterConf(listFilter);
+    } else {
+      setListFilterConf((d) => {
+        if (!Object.keys(d).length) {
+          return listFilter;
+        }
+        return d;
+      });
+    }
+  }, [listFilter]);
+
+  return [listFilter, setListFilter] as [
+    T,
+    React.Dispatch<React.SetStateAction<T>>,
+  ];
+}
+
+export {
+  useSetDocTitle,
+  useIsMobile,
+  useLocalStorageValue,
+  useHaveReadData,
+  useInitListFilterConf,
+};

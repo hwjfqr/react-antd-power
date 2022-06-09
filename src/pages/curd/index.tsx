@@ -10,8 +10,14 @@ import {
   message,
   Modal,
 } from 'antd';
+import { UpOutlined, DownOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
-import { TagSelector, ModalDetail, ModalForm } from 'ant-design-power';
+import {
+  TagSelector,
+  ModalDetail,
+  ModalForm,
+  TableList,
+} from 'ant-design-power';
 import StandardFormRow from '@/components/StandardFormRow';
 import Context from '@/context';
 import { getListItemDetails, listCols as cols } from './data';
@@ -23,6 +29,7 @@ import {
   CreateOrUpdateDataTYpe,
 } from './api';
 import styles from './index.less';
+import { useInitListFilterConf } from '@/utils/hoots';
 
 function CurdTemplate() {
   const { deviceType } = useContext(Context);
@@ -32,19 +39,29 @@ function CurdTemplate() {
     data: [],
     total: 0,
   });
-  const [listFilter, setListFilter] = useState<ListFilterType>({
-    page: 1,
-    pageSize: 10,
-    name: undefined,
-    type: 'all',
-  });
-  const getListFn = async () => {
+  const getListFn = async (listFilter: ListFilterType) => {
     const { data, total } = await getList(listFilter);
     setList({ data, total });
   };
-  useEffect(() => {
-    getListFn();
-  }, [listFilter]);
+  const [listFilter, setListFilter] = useInitListFilterConf<ListFilterType>(
+    'curd-list-filter-conf',
+    {
+      page: 1,
+      pageSize: 10,
+      name: undefined,
+      type: 'all',
+    },
+    (listFilterConf) => {
+      return {
+        ...listFilterConf,
+        name: undefined,
+        page: 1,
+      };
+    },
+    (listFilter) => {
+      getListFn(listFilter);
+    },
+  );
 
   /* 详情逻辑 */
   const [listItemDetailArgs, setListItemDetailArgs] = useState<{
@@ -68,6 +85,7 @@ function CurdTemplate() {
       title: '操作',
       dataIndex: 'operate',
       width: 120,
+      type: 'action',
       render: (_: any, r: any) => {
         return (
           <Space>
@@ -109,7 +127,7 @@ function CurdTemplate() {
                           page: listFilter.page - 1,
                         }));
                       } else {
-                        getListFn();
+                        getListFn(listFilter);
                       }
                     }
                   },
@@ -123,6 +141,8 @@ function CurdTemplate() {
       },
     },
   ];
+
+  const [displayFilter, setDisplayFilter] = useState(false);
 
   return (
     <div className={styles['curd-template']}>
@@ -145,73 +165,89 @@ function CurdTemplate() {
           style={{ marginBottom: deviceType === 'web' ? 16 : 0 }}
           size={deviceType === 'web' ? 'default' : 'small'}
         >
-          <Form layout="inline">
-            <StandardFormRow last>
-              <Form.Item label="用户名">
-                <Input.Search
-                  style={{ width: 150 }}
-                  size="small"
-                  enterButton
-                  allowClear
-                  defaultValue={listFilter.name}
-                  onSearch={(val) => {
-                    setListFilter((d) => ({
-                      ...d,
-                      name: val || undefined,
-                      page: 1,
-                    }));
-                  }}
-                ></Input.Search>
-              </Form.Item>
-              <Form.Item label="用户类型">
-                <TagSelector
-                  type="radio"
-                  tags={['管理员', '普通用户', '访客'].map((item) => ({
-                    label: item,
-                    value: item,
-                  }))}
-                  showAll
-                  value={listFilter.type}
-                  onChange={(val) => {
-                    setListFilter((d) => ({
-                      ...d,
-                      type: val,
-                      page: 1,
-                    }));
-                  }}
-                ></TagSelector>
-              </Form.Item>
-              {deviceType === 'mobile' ? (
-                <div>当前共有 {list.total} 条数据</div>
-              ) : null}
-            </StandardFormRow>
-          </Form>
+          {deviceType === 'web' || displayFilter ? (
+            <Form layout="inline">
+              <StandardFormRow last>
+                <Form.Item label="用户名">
+                  <Input.Search
+                    style={{ width: 150 }}
+                    size="small"
+                    enterButton
+                    allowClear
+                    defaultValue={listFilter.name}
+                    onSearch={(val) => {
+                      setListFilter((d) => ({
+                        ...d,
+                        name: val || undefined,
+                        page: 1,
+                      }));
+                    }}
+                  ></Input.Search>
+                </Form.Item>
+                <Form.Item label="用户类型">
+                  <TagSelector
+                    type="radio"
+                    tags={['管理员', '普通用户', '访客'].map((item) => ({
+                      label: item,
+                      value: item,
+                    }))}
+                    showAll
+                    value={listFilter.type}
+                    onChange={(val) => {
+                      setListFilter((d) => ({
+                        ...d,
+                        type: val,
+                        page: 1,
+                      }));
+                    }}
+                  ></TagSelector>
+                </Form.Item>
+                {deviceType === 'mobile' ? (
+                  <div>当前共有 {list.total} 条数据</div>
+                ) : null}
+              </StandardFormRow>
+            </Form>
+          ) : null}
+          {deviceType === 'mobile' ? (
+            <Button
+              type="link"
+              icon={displayFilter ? <UpOutlined /> : <DownOutlined />}
+              block
+              onClick={() => {
+                setDisplayFilter((d) => !d);
+              }}
+            >
+              {displayFilter ? '收起' : '展开'}筛选项
+            </Button>
+          ) : null}
         </Card>
         <Card size={deviceType === 'web' ? 'default' : 'small'}>
-          <Table
-            rowKey="id"
-            size="small"
-            columns={listCols}
-            dataSource={list.data}
-            pagination={{
-              total: list.total,
-              showTotal:
-                deviceType === 'web'
-                  ? (total) => `当前共有 ${total || '-'} 条数据`
-                  : undefined,
-              position: ['bottomCenter'],
-              current: listFilter.page,
-              pageSize: listFilter.pageSize,
-              showSizeChanger: true,
-              onChange: (page, pageSize) => {
-                setListFilter((d) => ({
-                  ...d,
-                  page,
-                  pageSize,
-                }));
+          <TableList
+            type={deviceType === 'web' ? 'table' : 'list'}
+            fields={listCols}
+            commonProps={{
+              rowKey: 'id',
+              size: 'small',
+              dataSource: list.data,
+              pagination: {
+                total: list.total,
+                showTotal:
+                  deviceType === 'web'
+                    ? (total) => `当前共有 ${total || '-'} 条数据`
+                    : undefined,
+                current: listFilter.page,
+                pageSize: listFilter.pageSize,
+                showSizeChanger: true,
+                onChange: (page, pageSize) => {
+                  setListFilter((d) => ({
+                    ...d,
+                    page,
+                    pageSize,
+                  }));
+                },
               },
             }}
-          ></Table>
+          />
         </Card>
 
         {/* 详情页面Modal */}
