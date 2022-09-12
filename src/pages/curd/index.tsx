@@ -257,7 +257,11 @@ function CurdTemplate() {
           visible={listItemDetailArgs.visible}
           data={listItemDetailArgs.data}
           onClose={() => setListItemDetailArgs({ visible: false, data: [] })}
-          modalProps={{ footer: null }}
+          modalProps={{
+            style: { top: deviceType === 'web' ? 12 : 0 },
+            width: deviceType === 'web' ? '50vw' : '96vw',
+            footer: null,
+          }}
         >
           {/* 额外要添加的内容 */}
         </ModalDetail>

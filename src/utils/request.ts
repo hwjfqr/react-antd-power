@@ -46,6 +46,11 @@ const errorHandler: ((error: ResponseError<any>) => void) | undefined = (
     });
   }
 
+  // 返回 blob 类型的值无法被展开，直接交由请求函数处理（针对文件上传逻辑）。
+  if (error.request?.options?.responseType === 'blob') {
+    return data;
+  }
+
   return {
     isError: true,
     ...data,
@@ -76,7 +81,8 @@ request.interceptors.request.use(
 // 响应拦截器(非 Restful API 错误处理)
 request.interceptors.response.use(
   async (response) => {
-    // if (response.ok) {
+    // 非 JSON 类型的响应数据（blob）无法通过 JSON 解析，因此需要排除。
+    // if (response.ok && config.responseType !== 'blob') {
     //   const data = await response.clone().json();
     //   const { code, msg } = data;
     //   if (code !== '0' && code !== 0) {
