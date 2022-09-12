@@ -1,21 +1,18 @@
-import { ReactNode, useState, useEffect } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { Dropdown, Menu } from 'antd';
 import ProLayout from '@ant-design/pro-layout';
-import {
-  LogoutOutlined,
-  UserOutlined,
-  SettingOutlined,
-} from '@ant-design/icons';
+import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { history } from 'umi';
+import { RouteComponentProps } from 'react-router-dom';
 import styles from './BaseLayout.less';
 import { useSetDocTitle, useIsMobile } from '@/utils/hoots';
 import Context from '@/context';
 
-interface BaseLayoutProps {
-  location: { pathname: string };
-  children: ReactNode;
-}
-function BaseLayout({ location, children }: BaseLayoutProps) {
+interface BaseLayoutProps {}
+const BaseLayout: FC<BaseLayoutProps & RouteComponentProps<{}>> = ({
+  location,
+  children,
+}) => {
   const deviceType = useIsMobile();
   useSetDocTitle('CurdTemplate');
 
@@ -117,5 +114,5 @@ function BaseLayout({ location, children }: BaseLayoutProps) {
       </ProLayout>
     </div>
   );
-}
+};
 export default BaseLayout;

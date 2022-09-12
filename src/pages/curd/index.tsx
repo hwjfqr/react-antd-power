@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { FC, useState, useEffect, useContext } from 'react';
 import {
   Table,
   Card,
@@ -16,7 +16,7 @@ import {
   TagSelector,
   ModalDetail,
   ModalForm,
-  TableList,
+  ReactiveTable,
 } from 'ant-design-power';
 import StandardFormRow from '@/components/StandardFormRow';
 import Context from '@/context';
@@ -31,7 +31,7 @@ import {
 import styles from './index.less';
 import { useInitListFilterConf } from '@/utils/hoots';
 
-function CurdTemplate() {
+const CurdTemplate: FC = () => {
   const { deviceType } = useContext(Context);
 
   /* 列表逻辑 */
@@ -222,7 +222,7 @@ function CurdTemplate() {
           ) : null}
         </Card>
         <Card size={deviceType === 'web' ? 'default' : 'small'}>
-          <TableList
+          <ReactiveTable
             type={deviceType === 'web' ? 'table' : 'list'}
             fields={listCols}
             commonProps={{
@@ -324,6 +324,6 @@ function CurdTemplate() {
       </PageContainer>
     </div>
   );
-}
+};
 
 export default CurdTemplate;
