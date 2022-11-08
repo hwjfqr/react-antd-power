@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
  * 设置网页标题
  * @param title
  */
-const useSetDocTitle = (title: string) => {
+export const useSetDocTitle = (title: string) => {
   useEffect(() => {
     document.title = title;
   }, [title]);
@@ -15,7 +15,7 @@ const useSetDocTitle = (title: string) => {
  * @param maxWidth 默认为 768px
  * @returns
  */
-const useIsMobile = (maxWidth = 768) => {
+export const useIsMobile = (maxWidth = 768) => {
   const [deviceType, setDeviceType] = useState<'web' | 'mobile'>(
     window.innerWidth > maxWidth ? 'web' : 'mobile',
   );
@@ -97,7 +97,7 @@ function useLocalStorageValue<T>(
  * @param name
  * @returns
  */
-function useHaveReadData(name: string) {
+export function useHaveReadData(name: string) {
   return useLocalStorageValue<Map<string, number>>(name, {
     initialValue: new Map([]),
     deserializer: (val) => {
@@ -118,14 +118,14 @@ function useHaveReadData(name: string) {
  * @param handleListFilterChange 当筛选状态变化时，要执行的回调。
  * @returns
  */
-function useInitListFilterConf<T>(
+export function useInitListFilterConf<T>(
   name: string,
   initListFilterValue: T,
   initListFilterOnConf: (listFilterConf: T) => T,
   handleListFilterChange: (listFilter: T) => void,
 ) {
   const [listFilter, setListFilter] = useState<T>(initListFilterValue);
-  const [listFilterConf, setListFilterConf] = useLocalStorageValue(name, {
+  const [listFilterConf, setListFilterConf] = useLocalStorageValue<any>(name, {
     initialValue: {},
   });
   const isFirstLoad = useRef(true);
@@ -143,7 +143,7 @@ function useInitListFilterConf<T>(
       handleListFilterChange(listFilter);
       setListFilterConf(listFilter);
     } else {
-      setListFilterConf((d) => {
+      setListFilterConf((d: any) => {
         if (!Object.keys(d).length) {
           return listFilter;
         }
@@ -158,10 +158,15 @@ function useInitListFilterConf<T>(
   ];
 }
 
-export {
-  useSetDocTitle,
-  useIsMobile,
-  useLocalStorageValue,
-  useHaveReadData,
-  useInitListFilterConf,
-};
+export function useInterval(cb: () => void, delay: number = 1000) {
+  const refContainer = useRef(cb);
+  useEffect(() => {
+    refContainer.current = cb; // 保存最新的 cb
+  });
+  useEffect(() => {
+    const timer = setInterval(() => {
+      refContainer.current(); // 此时执行的都是最新的 cb
+    }, delay);
+    return () => clearInterval(timer);
+  }, [delay]);
+}

@@ -82,16 +82,20 @@ export const describeItemAdaptationAlg = (
 };
 
 /**
- * 使用 setTimeout 实现类 setInterval 的效果，应用于轮询请求等场景。
+ * 使用 setTimeout 实现类 setInterval（时间间隔更精准），应用于轮询请求等场景。
  * @param cb
  * @param dely
  * @returns
  */
-export const setTimeout = (cb: () => void, dely = 1000) => {
+export const setTimeoutAdv = (cb: () => void, dely = 1000) => {
   let timer: number;
-  const inner = (fn: () => void) => {
-    if (fn) fn();
-    if (timer) clearTimeout(timer);
+  const inner = (cb: () => void) => {
+    if (cb) {
+      cb();
+    }
+    if (timer) {
+      clearTimeout(timer);
+    }
     timer = window.setTimeout(inner, dely, cb);
     return timer;
   };
