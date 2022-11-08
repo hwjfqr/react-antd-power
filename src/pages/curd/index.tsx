@@ -1,6 +1,5 @@
 import { FC, useState, useEffect, useContext } from 'react';
 import {
-  Table,
   Card,
   Form,
   Input,
@@ -9,8 +8,9 @@ import {
   Space,
   message,
   Modal,
+  Upload,
 } from 'antd';
-import { UpOutlined, DownOutlined } from '@ant-design/icons';
+import { UpOutlined, DownOutlined, UploadOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import {
   TagSelector,
@@ -30,6 +30,7 @@ import {
 } from './api';
 import styles from './index.less';
 import { useInitListFilterConf } from '@/utils/hoots';
+import UploadInForm from '@/components/UploadInForm';
 
 const CurdTemplate: FC = () => {
   const { deviceType } = useContext(Context);
@@ -277,6 +278,7 @@ const CurdTemplate: FC = () => {
             });
           }}
           onSubmit={async (value, isEdit) => {
+            console.log(value);
             const b = await CreateOrUpdateLIstItem(value);
             if (b) {
               message.success(!isEdit ? '添加成功！' : '修改成功！');
@@ -319,6 +321,9 @@ const CurdTemplate: FC = () => {
                 </Radio>
               ))}
             </Radio.Group>
+          </Form.Item>
+          <Form.Item label="附件" name="attachments" valuePropName="fileList">
+            <UploadInForm></UploadInForm>
           </Form.Item>
         </ModalForm>
       </PageContainer>
