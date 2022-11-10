@@ -7,6 +7,16 @@ export default {
         type: 'admin',
         status: 1,
         insert_time: 1646621708,
+        attachments: [
+          {
+            name: '图片01',
+            url: 'https://www.runoob.com/images/pulpit.jpg',
+          },
+          {
+            name: '图片02',
+            url: 'https://www.runoob.com/images/pulpit.jpg',
+          },
+        ],
       },
       {
         id: 2,
@@ -86,5 +96,8 @@ export default {
         insert_time: 1646621708,
       },
     ],
+  },
+  'POST /mock/upload': {
+    data: ['https://www.runoob.com/images/pulpit.jpg'],
   },
 };

@@ -82,7 +82,7 @@ export const describeItemAdaptationAlg = (
 };
 
 /**
- * 使用 setTimeout 实现类 setInterval（时间间隔更精准），应用于轮询请求等场景。
+ * 使用 setTimeout 实现类 setInterval（时间间隔精准），应用于轮询请求等场景。
  * @param cb
  * @param dely
  * @returns

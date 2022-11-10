@@ -17,6 +17,7 @@ import {
   ModalDetail,
   ModalForm,
   ReactiveTable,
+  UploadInForm,
 } from 'ant-design-power';
 import StandardFormRow from '@/components/StandardFormRow';
 import Context from '@/context';
@@ -30,7 +31,6 @@ import {
 } from './api';
 import styles from './index.less';
 import { useInitListFilterConf } from '@/utils/hoots';
-import UploadInForm from '@/components/UploadInForm';
 
 const CurdTemplate: FC = () => {
   const { deviceType } = useContext(Context);
@@ -322,8 +322,26 @@ const CurdTemplate: FC = () => {
               ))}
             </Radio.Group>
           </Form.Item>
-          <Form.Item label="附件" name="attachments" valuePropName="fileList">
-            <UploadInForm></UploadInForm>
+          <Form.Item label="附件" name="attachments">
+            <UploadInForm
+              action="/mock/upload"
+              transform={(fileList) => {
+                const result = fileList.map((item) => {
+                  const { response } = item;
+                  if (response) {
+                    const { data = [] } = response;
+                    const url = data[0] || undefined;
+                    return {
+                      url,
+                      ...item,
+                    };
+                  } else {
+                    return item;
+                  }
+                });
+                return result;
+              }}
+            ></UploadInForm>
           </Form.Item>
         </ModalForm>
       </PageContainer>

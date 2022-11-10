@@ -1,4 +1,5 @@
 import request from '@/utils/request';
+import { FileListType } from 'ant-design-power/es/UploadInForm';
 import { message } from 'antd';
 
 export type ListFilterType = {
@@ -30,6 +31,7 @@ export type CreateOrUpdateDataTYpe = {
   username: string;
   type: string;
   status: number;
+  attachments: FileListType;
 };
 export async function CreateOrUpdateLIstItem({
   id,

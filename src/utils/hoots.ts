@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { setTimeoutAdv } from './utils';
 
 /**
  * 设置网页标题
@@ -158,15 +159,21 @@ export function useInitListFilterConf<T>(
   ];
 }
 
+/**
+ * 应用于轮询等场景。
+ * @param cb
+ * @param delay
+ */
 export function useInterval(cb: () => void, delay: number = 1000) {
   const refContainer = useRef(cb);
   useEffect(() => {
-    refContainer.current = cb; // 保存最新的 cb
+    refContainer.current = cb;
   });
   useEffect(() => {
-    const timer = setInterval(() => {
-      refContainer.current(); // 此时执行的都是最新的 cb
+    const clear = setTimeoutAdv(() => {
+      refContainer.current();
     }, delay);
-    return () => clearInterval(timer);
+
+    return clear;
   }, [delay]);
 }
