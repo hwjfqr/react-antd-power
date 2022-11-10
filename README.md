@@ -3,7 +3,7 @@
 基于 React、UmiJS、Ant Design、TypeScript、Ant Design Power 的开发脚手架与基础模板（CURD、登录），适用于搭建 React 项目以及快速实现中后台相关业务场景。
 
 ## 特性
-- 自带基础 CURD 与登录页模板，并适配移动端；
+- 内置基础 CURD 与登录页模板，并适配移动端；
 - 内置一系列常用 Hook、工具方法，辅助业务开发；
 - 内置 UmiJS、Ant Design，满足中后台各类功能需求。
 
