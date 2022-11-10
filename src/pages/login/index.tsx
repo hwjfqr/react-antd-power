@@ -5,7 +5,7 @@ import styles from './index.less';
 import { sendSmsCode, login } from './api';
 // import { getCurrentUser } from '../../global-api';
 import { CountdownButton } from 'ant-design-power';
-import { useSetDocTitle } from '@/utils/hoots';
+import { useSetDocTitle } from '@/utils/hooks';
 
 const TEL_REGEXP = /^1\d{10}$/;
 

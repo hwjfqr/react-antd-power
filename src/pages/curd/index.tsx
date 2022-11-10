@@ -30,7 +30,7 @@ import {
   CreateOrUpdateDataTYpe,
 } from './api';
 import styles from './index.less';
-import { useInitListFilterConf } from '@/utils/hoots';
+import { useInitListFilterConf } from '@/utils/hooks';
 
 const CurdTemplate: FC = () => {
   const { deviceType } = useContext(Context);

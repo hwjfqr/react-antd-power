@@ -5,7 +5,7 @@ import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { history } from 'umi';
 import { RouteComponentProps } from 'react-router-dom';
 import styles from './BaseLayout.less';
-import { useSetDocTitle, useIsMobile } from '@/utils/hoots';
+import { useSetDocTitle, useIsMobile } from '@/utils/hooks';
 import Context from '@/context';
 
 interface BaseLayoutProps {}
