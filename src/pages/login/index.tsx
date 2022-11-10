@@ -18,10 +18,7 @@ export default () => {
 
   const [mode, setMode] = useState<'accountLogin' | 'msgLogin'>('accountLogin');
 
-  const [loginArgs, setLoginArgs] = useState<LoginArgsType>({
-    username: undefined,
-    password: undefined,
-  });
+  const [loginArgs, setLoginArgs] = useState<LoginArgsType>({});
   const [loading, setLoading] = useState({
     authCode: false,
   });
@@ -115,11 +112,11 @@ export default () => {
                   return;
                 }
               }
-              // const { isError, data } = await login(username, password);
-              // if (!isError) {
-              //   message.success('登录成功！');
-              //   history.push('/');
-              // }
+              const b = await login(username, password);
+              if (b) {
+                message.success('登录成功！');
+                history.push('/');
+              }
             }}
           >
             登录

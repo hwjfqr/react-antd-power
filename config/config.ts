@@ -41,4 +41,6 @@ export default defineConfig({
   define: {
     WEB_ENV: 'local-dev',
   },
+  hash: true,
+  dynamicImport: {},
 });
