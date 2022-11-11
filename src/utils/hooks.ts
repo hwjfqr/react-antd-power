@@ -43,7 +43,7 @@ export const useIsMobile = (maxWidth = 768) => {
  * @param options 包含初始值（initialValue）、序列化方法（serializer）、反序列化方法（deserializer）等配置。
  * @returns
  */
-function useLocalStorageValue<T>(
+export function useLocalStorageValue<T>(
   name: string,
   options:
     | {
