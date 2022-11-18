@@ -1,16 +1,6 @@
 import { FC, useState, useEffect, useContext } from 'react';
-import {
-  Card,
-  Form,
-  Input,
-  Radio,
-  Button,
-  Space,
-  message,
-  Modal,
-  Upload,
-} from 'antd';
-import { UpOutlined, DownOutlined, UploadOutlined } from '@ant-design/icons';
+import { Card, Form, Input, Radio, Button, Space, message, Modal } from 'antd';
+import { UpOutlined, DownOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import {
   TagSelector,
@@ -21,7 +11,7 @@ import {
 } from 'ant-design-power';
 import StandardFormRow from '@/components/StandardFormRow';
 import Context from '@/context';
-import { getListItemDetails, listCols as cols } from './data';
+import { getListItemDetails, listCols as cols, ListColsType } from './data';
 import {
   getList,
   CreateOrUpdateLIstItem,
@@ -34,15 +24,40 @@ import { useInitListFilterConf } from '@/utils/hooks';
 
 const CurdTemplate: FC = () => {
   const { deviceType } = useContext(Context);
+  const [displayComponentViewType, setDisplayComponentViewType] = useState<
+    'table' | 'list'
+  >('list');
+  useEffect(() => {
+    if (deviceType === 'web') {
+      setDisplayComponentViewType('table');
+    } else if (deviceType === 'mobile') {
+      setDisplayComponentViewType('list');
+    }
+  }, [deviceType]);
 
   /* 列表逻辑 */
-  const [list, setList] = useState({
+  const [list, setList] = useState<{
+    data: { [prop: string]: any }[];
+    total: number;
+  }>({
     data: [],
     total: 0,
   });
   const getListFn = async (listFilter: ListFilterType) => {
     const { data, total } = await getList(listFilter);
-    setList({ data, total });
+    if (deviceType === 'mobile' && displayComponentViewType === 'list') {
+      if (list.data.length && listFilter.page === 1) {
+        setList({ data, total });
+        const scrollableDivElm = document.getElementById('scrollableDiv');
+        if (scrollableDivElm) {
+          scrollableDivElm.scrollTop = 0;
+        }
+      } else {
+        setList((d) => ({ data: [...d.data, ...data], total }));
+      }
+    } else {
+      setList({ data, total });
+    }
   };
   const [listFilter, setListFilter] = useInitListFilterConf<ListFilterType>(
     'curd-list-filter-conf',
@@ -80,32 +95,34 @@ const CurdTemplate: FC = () => {
   }>({
     visible: false,
   });
-  const listCols = [
+  const listCols: ListColsType = [
     ...cols,
     {
       title: '操作',
       dataIndex: 'operate',
       width: 120,
       type: 'action',
-      render: (_: any, r: any) => {
+      render: (_, r) => {
         return (
           <Space>
-            <a
-              onClick={() => {
-                const data = getListItemDetails(r);
-                setListItemDetailArgs({
-                  visible: true,
-                  data,
-                });
-              }}
-            >
-              详情
-            </a>
+            {displayComponentViewType === 'table' ? (
+              <a
+                onClick={() => {
+                  const data = getListItemDetails(r);
+                  setListItemDetailArgs({
+                    visible: true,
+                    data,
+                  });
+                }}
+              >
+                详情
+              </a>
+            ) : null}
             <a
               onClick={() => {
                 setListItemFormArgs({
                   visible: true,
-                  data: { ...r },
+                  data: { ...(r as CreateOrUpdateDataTYpe) },
                 });
               }}
             >
@@ -142,6 +159,28 @@ const CurdTemplate: FC = () => {
       },
     },
   ];
+  listCols.find(({ dataIndex }: any) => dataIndex === 'username')!.render = (
+    text,
+    r: { [prop: string]: any },
+  ) => {
+    if (text) {
+      return (
+        <a
+          style={{ color: '#1890ff' }}
+          onClick={() => {
+            const data = getListItemDetails(r);
+            setListItemDetailArgs({
+              visible: true,
+              data,
+            });
+          }}
+        >
+          {text}
+        </a>
+      );
+    }
+    return '-';
+  };
 
   const [displayFilter, setDisplayFilter] = useState(false);
 
@@ -224,29 +263,57 @@ const CurdTemplate: FC = () => {
         </Card>
         <Card size={deviceType === 'web' ? 'default' : 'small'}>
           <ReactiveTable
-            type={deviceType === 'web' ? 'table' : 'list'}
+            type={displayComponentViewType}
             fields={listCols}
+            infiniteScroll={
+              deviceType === 'mobile'
+                ? {
+                    dataLength: list.data.length,
+                    next: () => {
+                      setListFilter((d) => ({
+                        ...d,
+                        page: d.page + 1,
+                      }));
+                    },
+                    hasMore: list.data.length < list.total,
+                    loader: (
+                      <div style={{ textAlign: 'center' }}>加载中...</div>
+                    ),
+                    endMessage: (
+                      <div style={{ textAlign: 'center' }}>加载完毕</div>
+                    ),
+                  }
+                : undefined
+            }
+            scrollableDivHeight={
+              deviceType === 'mobile'
+                ? 'calc(100vh - 56px - 56px - 48px - 28px)'
+                : undefined
+            }
             commonProps={{
               rowKey: 'id',
               size: 'small',
               dataSource: list.data,
-              pagination: {
-                total: list.total,
-                showTotal:
-                  deviceType === 'web'
-                    ? (total) => `当前共有 ${total || '-'} 条数据`
-                    : undefined,
-                current: listFilter.page,
-                pageSize: listFilter.pageSize,
-                showSizeChanger: true,
-                onChange: (page, pageSize) => {
-                  setListFilter((d) => ({
-                    ...d,
-                    page,
-                    pageSize,
-                  }));
-                },
-              },
+              pagination:
+                deviceType === 'web' || displayComponentViewType === 'table'
+                  ? {
+                      total: list.total,
+                      showTotal:
+                        deviceType === 'web'
+                          ? (total) => `当前共有 ${total || '-'} 条数据`
+                          : undefined,
+                      current: listFilter.page,
+                      pageSize: listFilter.pageSize,
+                      showSizeChanger: true,
+                      onChange: (page, pageSize) => {
+                        setListFilter((d) => ({
+                          ...d,
+                          page,
+                          pageSize,
+                        }));
+                      },
+                    }
+                  : false,
             }}
           />
         </Card>

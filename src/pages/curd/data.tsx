@@ -1,10 +1,11 @@
 import { ColumnsType } from 'antd/es/table';
 import moment from 'moment';
 
-export const listCols: ColumnsType<{ [prop: string]: any }> &
+export type ListColsType = ColumnsType<{ [prop: string]: any }> &
   {
     [prop: string]: any;
-  }[] = [
+  }[];
+export const listCols: ListColsType = [
   {
     title: '用户名',
     dataIndex: 'username',
@@ -36,6 +37,9 @@ export const getListItemDetails = (data: { [prop: string]: any }) => {
   });
   map = {
     ...map,
+    username: {
+      label: '用户名',
+    },
     insert_time: {
       label: '添加时间',
       format: (text?: number) =>

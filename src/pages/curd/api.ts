@@ -9,7 +9,7 @@ export type ListFilterType = {
   type?: string;
 };
 export async function getList({ page, pageSize, name, type }: ListFilterType) {
-  const { data = [], meta = { pagination: { total: 0 } } } = await request(
+  const { data = [], meta = { pagination: { total: 100 } } } = await request(
     '/mock/list',
     {
       params: {

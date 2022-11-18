@@ -119,15 +119,15 @@ export function useHaveReadData(name: string) {
  * @param handleListFilterChange 当筛选状态变化时，要执行的回调。
  * @returns
  */
-export function useInitListFilterConf<T>(
+export function useInitListFilterConf<T extends { [prop: string]: any }>(
   name: string,
   initListFilterValue: T,
   initListFilterOnConf: (listFilterConf: T) => T,
   handleListFilterChange: (listFilter: T) => void,
 ) {
   const [listFilter, setListFilter] = useState<T>(initListFilterValue);
-  const [listFilterConf, setListFilterConf] = useLocalStorageValue<any>(name, {
-    initialValue: {},
+  const [listFilterConf, setListFilterConf] = useLocalStorageValue<T>(name, {
+    initialValue: {} as T,
   });
   const isFirstLoad = useRef(true);
 

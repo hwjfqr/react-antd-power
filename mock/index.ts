@@ -81,20 +81,6 @@ export default {
         status: 1,
         insert_time: 1646621708,
       },
-      {
-        id: 11,
-        username: 'user2',
-        type: 'user',
-        status: 1,
-        insert_time: 1646621708,
-      },
-      {
-        id: 12,
-        username: 'guest1',
-        type: 'guest',
-        status: 1,
-        insert_time: 1646621708,
-      },
     ],
   },
   'POST /mock/upload': {
