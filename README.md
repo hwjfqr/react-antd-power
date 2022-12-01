@@ -12,9 +12,16 @@
 ```
 # 拉取
 git init
+git checkout -b template
 git remote add template git@github.com:hwjfqr/react-antd-power.git
 git pull template master
+git push origin template
+
+git checkout master
 git remote add origin xxx.com/xxx.git
+git pull template master
+git add *
+git commit -m 'init'
 git push origin master
 
 # 更新
